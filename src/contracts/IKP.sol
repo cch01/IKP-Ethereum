@@ -152,17 +152,12 @@ contract IKP {
           return;
         }
 
-        bool isRegisteredCa = true;
-        if (keccak256(abi.encodePacked(caList[_cname].name)) != keccak256(abi.encodePacked(_cname))) {
-            isRegisteredCa = false;
-        }
-
         rpList[_rpHash].reaction.trigger{value:rpMinimumPrice}(
           msg.sender, 
           caList[_cname].paymentAccount,
-					dcpList[_dname].paymentAccount,
-          isRegisteredCa
+					dcpList[_dname].paymentAccount
 				);
+
         caBalances[_cname] -= rpMinimumPrice;
         delete rpList[_rpHash];
         delete reportRecords[keccak256(abi.encodePacked(_dname, _cname, _key, msg.sender))];
