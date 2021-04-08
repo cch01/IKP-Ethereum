@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="./stylesheets/fullpage.css"/>
+    <link rel="stylesheet" type="text/css" href="./stylesheets/style.css"/>
+    <script type="text/javascript" src="./javascripts/fullpage.js"></script>
+    <script type="text/javascript" src="./javascripts/scrolloverflow.min.js"></script>
+
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+            crossorigin="anonymous"></script>
+    <!--jQuery-->
+    <script src="./javascripts/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <title>IKP</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark" style="z-index: 999; position: absolute;">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#"><span class="nav-brand-custom">IKP System</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-custom">
+                <li class="nav-item mx-3" data-menuanchor="status" class="active">
+                    <a class="nav-link active" href="#status">Status</a>
+                </li>
+                <li class="nav-item mx-3" data-menuanchor="sendGreet" class="active">
+                    <a class="nav-link active" href="#sendGreet">Greet</a>
+                </li>
+                <li class="nav-item mx-3" data-menuanchor="domainRegister" class="active">
+                    <a class="nav-link active" href="#domainRegister">Domain</a>
+                </li>
+                <!--                <li class="nav-item mx-3" data-menuanchor="buyRP">-->
+                <!--                    <a class="nav-link active" href="#buyRP">RP</a>-->
+                <!--                </li>-->
+                <li class="nav-item mx-3" data-menuanchor="caTools">
+                    <a class="nav-link active" href="#caTools">CA</a>
+                </li>
+                <!--                <li class="nav-item mx-3" data-menuanchor="checking">-->
+                <!--                    <a class="nav-link active" href="#checking">Check</a>-->
+                <!--                </li>-->
+                <li class="nav-item mx-3" data-menuanchor="checkingReportCert">
+                    <a class="nav-link active" href="#checkingReportCert">Report</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div id="fullpage" id="myMenu">
+    <!--    Status Section-->
+    <div class="section">
+        <div class="container justify-content-center d-flex">
+            <div class="col-sm-8 align-self-center">
+                <div class="card bg-transparent"
+                     style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
+                    <div class="row mb-4">
+                        <div class="text-white section-title">Send Greet</div>
+                    </div>
+                    <div class="row">
+                        <div class="d-flex justify-content-center mb-3">
+                            <div class="row ikp-form">
+                                <div class="row my-1">
+                                    <div class="col-sm-4 custom-output-label">Balance:</div>
+                                    <div class="col-sm-8">
+                                        <span class="custom-output" id="balance">Testing Output Balance</span>
+                                    </div>
+                                </div>
+                                <div class="row my-1">
+                                    <div class="col-sm-4 custom-output-label">RP Hash Value:</div>
+                                    <div class="col-sm-8">
+                                        <span class="custom-output" id="RPHashVal">Testing Output RP Hash</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--    Sending Greet Section-->
+    <div class="section">
+        <div class="container justify-content-center d-flex">
+            <div class="col-sm-8 align-self-center">
+                <div class="card bg-transparent"
+                     style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
+                    <div class="row mb-4">
+                        <div class="text-white section-title">Send Greet</div>
+                    </div>
+                    <div class="row">
+                        <div class="d-flex justify-content-center mb-3">
+                            <div class="row ikp-form">
+                                <div class="row">
+                            <textarea class="form-control" id="receiver" placeholder="Enter the greets"
+                                      rows="3"></textarea>
+                                </div>
+                                <div class="d-flex flex-row justify-content-center">
+                                    <button id="send" class="btn btn-light my-3 custom-form-btn"
+                                            onclick="App.setGreet()">Send
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--    Domain -->
+    <div class="section">
+        <!--        Domain Register Slide-->
+        <div class="slide" data-anchor="slide1">
+            <div class="container justify-content-center d-flex">
+                <div class="col-sm-8 align-self-center">
+                    <div class="card bg-transparent"
+                         style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
+                        <div class="row mb-4">
+                            <div class="text-white section-title pb-10">Domain Register</div>
+                        </div>
+                        <div class="row">
+                            <div class="d-flex justify-content-center mb-3">
+                                <div class="row ikp-form">
+                                    <div class="row my-1">
+                                        <label for="domainname"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Domain Name:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="domainname">
+                                        </div>
+                                    </div>
+                                    <div class="row my-1">
+                                        <label for="checkeraddress"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Checker:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="checkeraddress">
+                                        </div>
+                                    </div>
+                                    <div class="row my-1">
+                                        <label for="Domainthreshold"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Threshold:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="Domainthreshold">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-center">
+                                        <button class="btn btn-light my-3 custom-form-btn" id="Domainregister"
+                                                onclick="App.Domainregister()">Register
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--        Buying RP Slide-->
+        <div class="slide" data-anchor="slide2">
+            <div class="container justify-content-center d-flex">
+                <div class="col-sm-8 align-self-center">
+                    <div class="card bg-transparent"
+                         style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
+                        <div class="row mb-4">
+                            <div class="text-white section-title pb-10">RP Purchasing</div>
+                        </div>
+                        <div class="row">
+                            <div class="d-flex justify-content-center mb-3">
+                                <div class="row ikp-form">
+                                    <div class="row my-1">
+                                        <label for="RPHash"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Input Hash:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="RPHash">
+                                        </div>
+                                    </div>
+                                    <div class="row my-1">
+                                        <label for="RPissuer"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Issuer:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="RPissuer">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-center">
+                                        <button class="btn btn-light my-3 custom-form-btn" id="RPPurchase"
+                                                onclick="App.RPPurchase()">Purchase
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--    Buying RP Section-->
+    <!--    <div class=" section
+                                        ">-->
+    <!--        <div class="container justify-content-center d-flex">-->
+    <!--            <div class="col-sm-8 align-self-center">-->
+    <!--                <div class="card bg-transparent"-->
+    <!--                     style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">-->
+    <!--                    <div class="row mb-4">-->
+    <!--                        <div class="text-white section-title pb-10">RP Purchasing</div>-->
+    <!--                    </div>-->
+    <!--                    <div class="row">-->
+    <!--                        <div class="d-flex justify-content-center mb-3">-->
+    <!--                            <div class="row ikp-form">-->
+    <!--                                <div class="row my-1">-->
+    <!--                                    <label for="RPHash"-->
+    <!--                                           class="col-sm-4 col-form-label d-flex justify-content-end align-middle">-->
+    <!--                                        <span class="custom-input-label">Input Hash:</span></label>-->
+    <!--                                    <div class="col-sm-8">-->
+    <!--                                        <input type="text" class="form-control" id="RPHash">-->
+    <!--                                    </div>-->
+    <!--                                </div>-->
+    <!--                                <div class="row my-1">-->
+    <!--                                    <label for="RPissuer"-->
+    <!--                                           class="col-sm-4 col-form-label d-flex justify-content-end align-middle">-->
+    <!--                                        <span class="custom-input-label">Issuer:</span></label>-->
+    <!--                                    <div class="col-sm-8">-->
+    <!--                                        <input type="text" class="form-control" id="RPissuer">-->
+    <!--                                    </div>-->
+    <!--                                </div>-->
+    <!--                                <div class="d-flex flex-row justify-content-center">-->
+    <!--                                    <button class="btn btn-light my-3 custom-form-btn" id="RPPurchase">Register</button>-->
+    <!--                                </div>-->
+    <!--                            </div>-->
+    <!--                        </div>-->
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+
+    <!--    CA Section-->
+    <div class="section">
+        <!--        CA Register Slide-->
+        <div class="slide" data-anchor="slide1">
+            <div class="container justify-content-center d-flex">
+                <div class="col-sm-8 align-self-center">
+                    <div class="card bg-transparent"
+                         style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
+                        <div class="row mb-4">
+                            <div class="text-white section-title pb-10">CA
+                                Register
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="d-flex justify-content-center mb-3">
+                                <div class="row ikp-form">
+                                    <div class="row my-1">
+                                        <label for="caname"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Input Name:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control"
+                                                   id="caname">
+                                        </div>
+                                    </div>
+                                    <div class="row my-1">
+                                        <label for="publickey"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Public Key:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control"
+                                                   id="publickey">
+                                        </div>
+                                    </div>
+                                    <div class="row my-1">
+                                        <label for="threshold"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Threshold:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control"
+                                                   id="threshold">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-center">
+                                        <button class="btn btn-light my-3 custom-form-btn"
+                                                id="caregister" onclick="App.caregister()">Register
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--        CA Issue RP-->
+        <div class="slide" data-anchor="slide2">
+            <div class="container justify-content-center d-flex">
+                <div class="col-sm-8 align-self-center">
+                    <div class="card bg-transparent"
+                         style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
+                        <div class="row mb-4">
+                            <div class="text-white section-title pb-10">CA Issue RP
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="d-flex justify-content-center mb-3">
+                                <div class="row ikp-form">
+                                    <div class="row my-1">
+                                        <label for="isseRP"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Input Address:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control"
+                                                   id="isseRP">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-center">
+                                        <button class="btn btn-light my-3 custom-form-btn"
+                                                id="issue" onclick="App.issue_RP()">Issue
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--        CA Revoke Cert-->
+        <div class="slide" data-anchor="slide3">
+            <div class="container justify-content-center d-flex">
+                <div class="col-sm-8 align-self-center">
+                    <div class="card bg-transparent"
+                         style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
+                        <div class="row mb-4">
+                            <div class="text-white section-title pb-10">CA Revoke
+                                Cert
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="d-flex justify-content-center mb-3">
+                                <div class="row ikp-form">
+                                    <div class="row my-1">
+                                        <label for="revokecert"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Input Cert:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control"
+                                                   id="revokecert">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-center">
+                                        <button class="btn btn-light my-3 custom-form-btn"
+                                                id="revokes" onclick="App.revokecert()">Revoke
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--    Checking Cert and Revoke List Section-->
+    <div class="section">
+        <!--        Checking Cert Slide-->
+        <div class="slide" data-anchor="slide1">
+            <div class="container justify-content-center d-flex">
+                <div class="col-sm-8 align-self-center">
+                    <div class="card bg-transparent"
+                         style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
+                        <div class="row mb-4">
+                            <div class="text-white section-title pb-10">Check Cert
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="d-flex justify-content-center mb-3">
+                                <div class="row ikp-form">
+                                    <div class="row my-1">
+                                        <label for="certToVerify"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Input Cert:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control"
+                                                   id="certToVerify">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-center">
+                                        <button class="btn btn-light my-3 custom-form-btn"
+                                                id="Check" onclick="App.check()">Check
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--        Checking Revoke List Slide-->
+        <div class="slide" data-anchor="slide2">
+            <div class="container justify-content-center d-flex">
+                <div class="col-sm-8 align-self-center">
+                    <div class="card bg-transparent"
+                         style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
+                        <div class="row mb-4">
+                            <div class="text-white section-title pb-10">Check Revoke
+                                List
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="d-flex justify-content-center mb-3">
+                                <div class="row ikp-form">
+                                    <div class="row my-1">
+                                        <label for="certisrevoke"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Input Cert:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control"
+                                                   id="certisrevoke">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-center">
+                                        <button class="btn btn-light my-3 custom-form-btn"
+                                                id="getRevoke" onclick="App.getRevoke()">Check
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--        Reporting Cert Slide-->
+        <div class="slide" data-anchor="slide3">
+            <div class="container justify-content-center d-flex">
+                <div class="col-sm-8 align-self-center">
+                    <div class="card bg-transparent"
+                         style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
+                        <div class="row mb-4">
+                            <div class="text-white section-title pb-10">Report
+                                Abnormal Cert
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="d-flex justify-content-center mb-3">
+                                <div class="row ikp-form">
+                                    <div class="row my-1">
+                                        <label for="cert"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Input Cert:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control"
+                                                   id="cert">
+                                        </div>
+                                    </div>
+                                    <div class="row my-1">
+                                        <label for="nonce"
+                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            <span class="custom-input-label">Input Nonce:</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control"
+                                                   id="nonce">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-center">
+                                        <button class="btn btn-light my-3 mx-1 custom-form-btn"
+                                                id="sendcommit" onclick="App.sendcommit()">Send
+                                            Commit
+                                        </button>
+                                        <button class="btn btn-light my-3 mx-1 custom-form-btn"
+                                                id="reveal" onclick="App.reveal()">Send
+                                            Reveal
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--    &lt;!&ndash;    Report Abnormal Cert Section&ndash;&gt;-->
+    <!--    <div class="section">-->
+    <!--        <div class="container justify-content-center d-flex">-->
+    <!--            <div class="col-sm-8 align-self-center">-->
+    <!--                <div class="card bg-transparent"-->
+    <!--                     style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">-->
+    <!--                    <div class="row mb-4">-->
+    <!--                        <div class="text-white section-title pb-10">Report Abnormal Cert</div>-->
+    <!--                    </div>-->
+    <!--                    <div class="row">-->
+    <!--                        <div class="d-flex justify-content-center mb-3">-->
+    <!--                            <div class="row ikp-form">-->
+    <!--                                <div class="row my-1">-->
+    <!--                                    <label for="cert"-->
+    <!--                                           class="col-sm-4 col-form-label d-flex justify-content-end align-middle">-->
+    <!--                                        <span class="custom-input-label">Input Cert:</span></label>-->
+    <!--                                    <div class="col-sm-8">-->
+    <!--                                        <input type="text" class="form-control" id="cert">-->
+    <!--                                    </div>-->
+    <!--                                </div>-->
+    <!--                                <div class="row my-1">-->
+    <!--                                    <label for="nonce"-->
+    <!--                                           class="col-sm-4 col-form-label d-flex justify-content-end align-middle">-->
+    <!--                                        <span class="custom-input-label">Input Nonce:</span></label>-->
+    <!--                                    <div class="col-sm-8">-->
+    <!--                                        <input type="text" class="form-control" id="nonce">-->
+    <!--                                    </div>-->
+    <!--                                </div>-->
+    <!--                                <div class="d-flex flex-row justify-content-center">-->
+    <!--                                    <button class="btn btn-light my-3 mx-1 custom-form-btn" id="sendcommit">Send Commit-->
+    <!--                                    </button>-->
+    <!--                                    <button class="btn btn-light my-3 mx-1 custom-form-btn" id="reveal">Send Reveal-->
+    <!--                                    </button>-->
+    <!--                                </div>-->
+    <!--                            </div>-->
+    <!--                        </div>-->
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+</div>
+</body>
+</html>
+<script>
+  new fullpage('#fullpage', {
+    menu: '#myMenu',
+    lockAnchors: false,
+    // anchors: ['status', 'sendGreet', 'domainRegister', 'buyRP', 'caTools', 'checking', 'reportCert'],
+    anchors: ['status', 'sendGreet', 'domainRegister', 'caTools', 'checkingReportCert'],
+    // sectionsColor: ['#0798ec', '#db6400', '#f48b29', '#fed049', '#289672', '#ADD8E6', '#f05945'],
+    sectionsColor: ['#0798ec', '#db6400', '#f48b29', '#289672', '#f05945'],
+    navigation: true,
+    // navigationTooltips: ['Status', 'Greet', 'Domain', 'RP', 'CA', 'Check', 'Report'],
+    navigationTooltips: ['Status', 'Greet', 'Domain', 'CA', 'Check / Report'],
+    showActiveTooltip: true,
+    slidesNavigation: true,
+    controlArrows: false
+  })
+</script>

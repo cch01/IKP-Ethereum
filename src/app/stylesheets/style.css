@@ -1,0 +1,46 @@
+.section {
+    text-align: center;
+}
+
+.section-title {
+    font-size: 2em;
+    font-weight: bolder;
+}
+
+
+.nav-custom {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.nav-brand-custom {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+
+.ikp-form {
+    width: 70%;
+}
+
+.custom-form-btn {
+    width: 30%;
+}
+
+.custom-input-label {
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.custom-output-label {
+    color: white;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.custom-output {
+    color: white;
+    font-weight: bold;
+    font-size: 1.3rem;
+}
