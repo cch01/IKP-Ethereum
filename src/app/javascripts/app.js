@@ -6,17 +6,9 @@ import { default as Web3} from 'web3';
 import { default as contract } from 'truffle-contract';
 
 // Import our contract artifacts and turn them into usable abstractions.
-import greeter_artifacts from '../../contractArtifacts/Greeter.json';
 import ikp_artifacts from '../../contractArtifacts/IKP.json';
-import dcp_artifacts from '../../contractArtifacts/DCPChecker.json';
-import rp_artifacts from '../../contractArtifacts/RpReaction.json';
-// Greeter is our usable abstraction, which we'll use through the code below.
-var Greeter = contract(greeter_artifacts);
 
 var IKP = contract(ikp_artifacts);
-var DCP = contract(dcp_artifacts);
-var RP = contract(rp_artifacts);
-
 
 // The following code is simple to show off interacting with your contracts.
 // As your needs grow you will likely need to change its form and structure.
@@ -116,12 +108,12 @@ window.App = {
     });
   },
 
-  Domainregister: function() {
+  registerDomain: function() {
     var self = this;
     var ikp;
     var dcp;
-    var domainname = document.getElementById("domainname").value;
-    var checkeraddress = document.getElementById("checkeraddress").value;
+    var domainName = document.getElementById("domainName").value;
+    var checkerAddress = document.getElementById("checkerAddress").value;
     var Domainthreshold = document.getElementById("Domainthreshold").value;
 
 
@@ -130,7 +122,7 @@ window.App = {
       return DCP.deployed();
     }).then(function(instance) {
       dcp = instance;
-      ikp.domainRegister.call(web3.toHex(domainname), dcp.address,
+      ikp.registerDomain.call(web3.toHex(domainName), dcp.address,
                               ["0xC55F5005e1AD3FB49734b50885105Ce6e0158CF1", "0x0De1962d829777644d8af8396cb95796C68A30e8"],
                               Domainthreshold, {from:account, value:web3.toWei(1, "ether")});
     }).catch(function(e) {
@@ -139,7 +131,7 @@ window.App = {
     });
   },
 
-  RPPurchase: function() {
+  purchaseRp: function() {
     var self = this;
     var ikp;
     var RPHash = document.getElementById("RPHash").value;
@@ -149,7 +141,7 @@ window.App = {
 
     IKP.deployed().then(function(instance) {
       ikp = instance;
-      return ikp.rpPurchase.call(RPHash,RPissuer,{from:account});
+      return ikp.purchaseRp.call(RPHash,RPissuer,{from:account});
     }).then(function(value){
       // var greetWord = document.getElementById("balance");
       // greetWord.innerHTML = value.valueOf();
@@ -159,7 +151,7 @@ window.App = {
     });
   },
 
-  caregister: function() {
+  registerCa: function() {
     var self = this;
     var ikp;
     var caname = document.getElementById("caname").value;
@@ -169,7 +161,7 @@ window.App = {
 
     IKP.deployed().then(function(instance) {
       ikp = instance;
-      return ikp.caRegister.call(caname,publickey,threshold,{from:account, value:web3.toWei(15, "ether")});
+      return ikp.registerCa.call(caname,publickey,threshold,{from:account, value:web3.toWei(15, "ether")});
     }).then(function(value){
       // var greetWord = document.getElementById("balance");
       // greetWord.innerHTML = value.valueOf();
@@ -179,7 +171,7 @@ window.App = {
     });
   },
 
-  issue_RP: function() {
+  issueRP: function() {
     var self = this;
     var ikp;
     var issueRP = document.getElementById("issueRP").value;
@@ -213,7 +205,7 @@ window.App = {
     });
   },
 
-  check: function() {
+  commitReport: function() {
     var self = this;
     var ikp;
     var certToVerify = document.getElementById("certToVerify").value;
@@ -231,7 +223,7 @@ window.App = {
     });
   },
 
-  getRevoke: function() {
+  revealReport: function() {
     var self = this;
     var ikp;
     var certisrevoke = document.getElementById("certisrevoke").value;
