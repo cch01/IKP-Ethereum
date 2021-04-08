@@ -1,157 +1,98 @@
-// Import the page's CSS. Webpack will know what to do with it.
-import "../stylesheets/app.css";
-
-// Import libraries we need.
 import { default as Web3} from 'web3';
 import { default as contract } from 'truffle-contract';
+import _ from 'lodash';
+import $ from './jquery-3.6.0.min';
 
-// Import our contract artifacts and turn them into usable abstractions.
-import ikp_artifacts from '../../contractArtifacts/IKP.json';
+import IkpAbi from '../../contractArtifacts/IKP.json';
+import DcpCheckerAbi from '../../contractArtifacts/DCPChecker.json';
+import RPReactionAbi from '../../contractArtifacts/RPReaction.json';
 
-var IKP = contract(ikp_artifacts);
+// import "toastify-js/src/toastify.css"
+// import Toastify from 'toastify-js'
 
-// The following code is simple to show off interacting with your contracts.
-// As your needs grow you will likely need to change its form and structure.
-// For application bootstrapping, check out window.addEventListener below.
-var accounts;
-var account;
+
+import toasts from './toast'
+
+const IKP = contract(IkpAbi);
+const DCPChecker = contract(DcpCheckerAbi);
+const RPReaction = contract(RPReactionAbi);
+
+const accounts = {
+  ikpOwner: null,
+  domain: null,
+  ca1: null,
+  ca2: null,
+  ca3: null
+};
+
+const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+
+IKP.setProvider(web3.currentProvider);
+DCPChecker.setProvider(web3.currentProvider);
+RPReaction.setProvider(web3.currentProvider);
+
+let ikpDeployed;
+let dcpCheckerDeployed;
+let rpReactionDeployed;
 
 window.App = {
-  start: function() {
-    var self = this;
-    // document.getElementById("greet").style.visibility='hidden';
-    // document.getElementById("greet").style.visibility='visible';
+  start: async() => {
+    const _accounts = await web3.eth.getAccounts();
+    if(_.isEmpty(_accounts)) alert("No accounts found, please check blockchain connection settings.");
+    Object.keys(accounts).forEach((key, i) => {
+      accounts[key] = _accounts[i]
+    })
+    console.log(accounts);
+    ikpDeployed = await IKP.deployed();
+    dcpCheckerDeployed = await DCPChecker.deployed();
+    rpReactionDeployed = await RPReaction.deployed();
 
-    document.getElementById("CA").style.display='none';
-    document.getElementById("client").style.display='none';
-    document.getElementById("greet").style.display='none';
-    document.getElementById("Domain").style.display='none';
+    //TODO: Show accounts name and balance on web UI
 
-
-    // Bootstrap the MetaCoin abstraction for Use.
-    Greeter.setProvider(web3.currentProvider);
-    IKP.setProvider(web3.currentProvider);
-    DCP.setProvider(web3.currentProvider);
-    RP.setProvider(web3.currentProvider);
-
-    // Get the initial account balance so it can be displayed.
-    web3.eth.getAccounts(function(err, accs) {
-      if (err != null) {
-        alert("There was an error fetching your accounts.");
-        return;
-      }
-
-      if (accs.length == 0) {
-        alert("Couldn't get any accounts! Make sure your Ethereum client is configured correctly.");
-        return;
-      }
-
-      accounts = accs;
-      account = accounts[0];
-
-      // self.refreshBalance();
-      self.showGreet();
-      
-    });
   },
 
-  chooseCA: function() {
-    document.getElementById("CA").style.display='inherit';
-    document.getElementById("client").style.display='none';
-    document.getElementById("Domain").style.display='none';
+  refreshBalance: () => {
+
   },
 
-  chooseDomain: function() {
-    document.getElementById("CA").style.display='none';
-    document.getElementById("client").style.display='none';
-    document.getElementById("Domain").style.display='inherit';
+  registerDomain: async() => {
+    const domainName = $("#registerDomain_domainName").val()
+    const checkerAddress = $("#registerDomain_checkerAddress").val()
+    const publicKeys = $("#registerDomain_publicKeys").val()
+
+    const publicKeyList = _.map(publicKeys.split(","), _key => _key.trim());
+    console.log(publicKeyList)
+    const result = await ikpDeployed.registerDomain(
+      domainName, 
+      checkerAddress, 
+      publicKeyList, 
+      { from:accounts.domain, value:web3.utils.toWei('1', "ether")}
+    );
+    if(!_.isEmpty(result)) toasts.success();
+    console.log(result)
   },
 
-  chooseClient: function() {
-    document.getElementById("client").style.display='inherit';
-    document.getElementById("CA").style.display='none';
-    document.getElementById("Domain").style.display='none';
-  },
-
-  setStatus: function(message) {
-    var status = document.getElementById("status");
-    status.innerHTML = message;
-  },
-
-  // refreshBalance: function() {
-  //   var self = this;
-
-  //   var meta;
-    // MetaCoin.deployed().then(function(instance) {
-    //   meta = instance;
-    //   return meta.getBalance.call(account, {from: account});
-    // }).then(function(value) {
-    //   var balance_element = document.getElementById("balance");
-    //   balance_element.innerHTML = value.valueOf();
-    // }).catch(function(e) {
-    //   console.log(e);
-    //   self.setStatus("Error getting balance; see log.");
-    // });
-  // },
-  showGreet: function() {
-    var self = this;
-    var gre;
-    Greeter.deployed().then(function(instance) {
-      gre = instance;
-      return gre.greet.call(account,{from:account});
-    }).then(function(value){
-      var greetWord = document.getElementById("balance");
-      greetWord.innerHTML = value.valueOf();
-    }).catch(function(e) {
-      console.log(e);
-      self.setStatus("Error getting greet word; see log.");
-    });
-  },
-
-  registerDomain: function() {
-    var self = this;
-    var ikp;
-    var dcp;
-    var domainName = document.getElementById("domainName").value;
-    var checkerAddress = document.getElementById("checkerAddress").value;
-    var Domainthreshold = document.getElementById("Domainthreshold").value;
-
-
-    IKP.deployed().then(function (instance) {
-      ikp = instance;
-      return DCP.deployed();
-    }).then(function(instance) {
-      dcp = instance;
-      ikp.registerDomain.call(web3.toHex(domainName), dcp.address,
-                              ["0xC55F5005e1AD3FB49734b50885105Ce6e0158CF1", "0x0De1962d829777644d8af8396cb95796C68A30e8"],
-                              Domainthreshold, {from:account, value:web3.toWei(1, "ether")});
-    }).catch(function(e) {
-      console.log(e);
-      self.setStatus("Error getting greet word; see log.");
-    });
-  },
-
-  purchaseRp: function() {
+  purchaseRp: () => {
     var self = this;
     var ikp;
     var RPHash = document.getElementById("RPHash").value;
     var RPissuer = document.getElementById("RPissuer").value;
 
-
-
-    IKP.deployed().then(function(instance) {
+    IKP.deployed().then((instance) => {
       ikp = instance;
       return ikp.purchaseRp.call(RPHash,RPissuer,{from:account});
-    }).then(function(value){
+    }).then((value) => {
       // var greetWord = document.getElementById("balance");
       // greetWord.innerHTML = value.valueOf();
-    }).catch(function(e) {
+    }).catch((e) => {
       console.log(e);
       self.setStatus("Error getting greet word; see log.");
     });
   },
 
-  registerCa: function() {
+  revokeRpPurchase: () => {},
+
+  registerCa: () => {
     var self = this;
     var ikp;
     var caname = document.getElementById("caname").value;
@@ -159,175 +100,118 @@ window.App = {
     var threshold = document.getElementById("threshold").value;
 
 
-    IKP.deployed().then(function(instance) {
+    IKP.deployed().then((instance) => {
       ikp = instance;
       return ikp.registerCa.call(caname,publickey,threshold,{from:account, value:web3.toWei(15, "ether")});
-    }).then(function(value){
+    }).then((value) => {
       // var greetWord = document.getElementById("balance");
       // greetWord.innerHTML = value.valueOf();
-    }).catch(function(e) {
+    }).catch((e) => {
       console.log(e);
       self.setStatus("Error getting greet word; see log.");
     });
   },
 
-  issueRP: function() {
+  issueRP: () => {
     var self = this;
     var ikp;
     var issueRP = document.getElementById("issueRP").value;
 
-    IKP.deployed().then(function(instance) {
+    IKP.deployed().then((instance) => {
       ikp = instance;
       return ikp.rpIssue.call(issueRP,{from:account});
-    }).then(function(value){
+    }).then((value) => {
       // var greetWord = document.getElementById("balance");
       // greetWord.innerHTML = value.valueOf();
-    }).catch(function(e) {
+    }).catch((e) => {
       console.log(e);
       self.setStatus("Error getting greet word; see log.");
     });
   },
 
-  revokecert: function() {
-    var self = this;
-    var ikp;
-    var revokecert = document.getElementById("revokecert").value;
 
-    IKP.deployed().then(function(instance) {
-      ikp = instance;
-      return ikp.revoke.call(revokecert,{from:account});
-    }).then(function(value){
-      // var greetWord = document.getElementById("balance");
-      // greetWord.innerHTML = value.valueOf();
-    }).catch(function(e) {
-      console.log(e);
-      self.setStatus("Error getting greet word; see log.");
-    });
-  },
-
-  commitReport: function() {
+  commitReport: () => {
     var self = this;
     var ikp;
     var certToVerify = document.getElementById("certToVerify").value;
 
-    IKP.deployed().then(function(instance) {
+    IKP.deployed().then((instance) => {
       ikp = instance;
       // need to be editted
       return ikp.isRevoked.call(certToVerify,{from:account});
-    }).then(function(value){
+    }).then((value)=> {
       // var greetWord = document.getElementById("balance");
       // greetWord.innerHTML = value.valueOf();
-    }).catch(function(e) {
+    }).catch((e) => {
       console.log(e);
       self.setStatus("Error getting greet word; see log.");
     });
   },
 
-  revealReport: function() {
+  revealReport: () => {
     var self = this;
     var ikp;
     var certisrevoke = document.getElementById("certisrevoke").value;
 
-    IKP.deployed().then(function(instance) {
+    IKP.deployed().then((instance) => {
       ikp = instance;
-      return ikp.isRevoked.call(certisrevoke,{from:account});
-    }).then(function(value){
+      return ikp.isRevoked.call(certisrevoke, {from:account});
+    }).then((value) => {
       // var greetWord = document.getElementById("balance");
       // greetWord.innerHTML = value.valueOf();
-    }).catch(function(e) {
+    }).catch((e) => {
       console.log(e);
       self.setStatus("Error getting greet word; see log.");
     });
   },
 
-  sendcommit: function() {
+  commitReport: () => {
     var self = this;
     var ikp;
     var cert = document.getElementById("cert").value;
     var nonce = document.getElementById("nonce").value;
 
-    IKP.deployed().then(function(instance) {
+    IKP.deployed().then((instance) => {
       ikp = instance;
       return ikp.reportCommit.call(cert,nonce,{from:account});
-    }).then(function(value){
+    }).then((value) => {
       // var greetWord = document.getElementById("balance");
       // greetWord.innerHTML = value.valueOf();
-    }).catch(function(e) {
+    }).catch((e) => {
       console.log(e);
       self.setStatus("Error getting greet word; see log.");
     });
   },
 
-  reveal: function() {
+  revealReport: () => {
     var self = this;
     var ikp;
     var cert = document.getElementById("cert").value;
     var nonce = document.getElementById("nonce").value;
 
-    IKP.deployed().then(function(instance) {
+    IKP.deployed().then((instance) => {
       ikp = instance;
-      return ikp.reportReveal.call(cert,nonce,{from:account});
-    }).then(function(value){
+      return ikp.reportReveal.call(cert,nonce, {from:account});
+    }).then((value) => {
       // var greetWord = document.getElementById("balance");
       // greetWord.innerHTML = value.valueOf();
-    }).catch(function(e) {
+    }).catch((e) => {
       console.log(e);
       self.setStatus("Error getting greet word; see log.");
     });
   },
-  // sendCoin: function() {
-  //   var self = this;
-
-  //   var amount = parseInt(document.getElementById("amount").value);
-  //   var receiver = document.getElementById("receiver").value;
-
-  //   this.setStatus("Initiating transaction... (please wait)");
-
-  //   var meta;
-  //   MetaCoin.deployed().then(function(instance) {
-  //     meta = instance;
-  //     return meta.sendCoin(receiver, amount, {from: account});
-  //   }).then(function() {
-  //     self.setStatus("Transaction complete!");
-  //     self.refreshBalance();
-  //   }).catch(function(e) {
-  //     console.log(e);
-  //     self.setStatus("Error sending coin; see log.");
-  //   });
-  // }
-
-    setGreet: function() {
-      var self = this;
-      var greetWord = document.getElementById("receiver").value;
-      this.setStatus("setting greet word.....(please wait)");
-      var gre;
-      Greeter.deployed().then(function(instance) {
-        gre = instance;
-        return gre.setGreeting(greetWord,{from:account});
-      }).then(function() {
-        self.setStatus("Setting complete!");
-        self.showGreet();
-      }).catch(function(e) {
-        console.log(e);
-        self.setStatus("Error setting greet word; see log")
-      });
-    }
-
 };
 
-window.addEventListener('load', function() {
+window.addEventListener('load', () => {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-  if (typeof web3 !== 'undefined') {
-    console.warn("Using web3 detected from external source. If you find that your accounts don't appear or you have 0 MetaCoin, ensure you've configured that source properly. If using MetaMask, see the following link. Feel free to delete this warning. :) http://truffleframework.com/tutorials/truffle-and-metamask")
-    // Use Mist/MetaMask's provider
-    window.web3 = new Web3(web3.currentProvider);
-  } else {
-    console.warn("No web3 detected. Falling back to http://127.0.0.1:7545. You should remove this fallback when you deploy live, as it's inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask");
-    // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-    window.web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
-  }
-
+  // if (typeof web3 !== 'undefined') {
+  //   console.warn("Using web3 detected from external source. If you find that your accounts don't appear or you have 0 MetaCoin, ensure you've configured that source properly. If using MetaMask, see the following link. Feel free to delete this warning. :) http://truffleframework.com/tutorials/truffle-and-metamask")
+  //   // Use Mist/MetaMask's provider
+  //   window.web3 = new Web3(web3.currentProvider);
+  // } else {
+  //   console.warn("No web3 detected. Falling back to http://127.0.0.1:7545. You should remove this fallback when you deploy live, as it's inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask");
+  //   // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+  //   window.web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
+  // }
   App.start();
-  console.log('App started');
-
 });
