@@ -9,13 +9,13 @@ export const CaStatus = (_cname, _ownerAddr, _accountId, _ethBalance,  _ikpBalan
     </div>
     <div class="d-flex justify-content-around">
       <div class="custom-output-label">ETH Account Balance: </div>
-      <div class="custom-output" id="account-balance-${_accountId}">
+      <div class="custom-output account-balance-${_accountId}">
         ${_ethBalance} ETH
       </div>
     </div>
     <div class="d-flex justify-content-around">
       <div class="custom-output-label">IKP Account Balance: </div>
-      <div class="custom-output" id="ikp-balance-${_accountId}">
+      <div class="custom-output ikp-ca-balance-${_cname}" >
           ${_ikpBalance} ETH
       </div>
     </div>

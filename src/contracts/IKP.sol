@@ -57,7 +57,7 @@ contract IKP {
     mapping(bytes32 => ReportRecord) private reportRecords;
     
     event NewTransaction(string message);
-
+    event RpPurchased(bytes32 rpHash);
     function registerCa (string memory _name, string[] memory _pks) public payable {
         require(msg.value >= registerCaFee, "Not enough registration fee.");
         require(!caList[_name].inUse, "This account already in use.");
@@ -120,7 +120,7 @@ contract IKP {
       PendingRpPurchase memory newPendingRpPurchase = PendingRpPurchase({ cname:_cname, amount:msg.value, domainAddr: msg.sender, purchasedAt: block.timestamp, rpReactionAddr:_reactionContractAddress });
       pendingRpPurchaseMapping[_rpHash] = newPendingRpPurchase;
 
-      emit NewTransaction('RP purchased.');
+      emit RpPurchased(_rpHash);
       return _rpHash;
     }
 

@@ -9,7 +9,7 @@ export const DcpStatus = (_dname, _ownerAddr, _accountID,  _ethBalance, _keys) =
     </div>
     <div class="d-flex justify-content-around">
       <div class="custom-output-label">ETH Account Balance: </div>
-      <div class="custom-output" id="account-balance-${_accountID}">
+      <div class="custom-output account-balance-${_accountID}" >
           ${_ethBalance} ETH
       </div>
     </div>
