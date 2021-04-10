@@ -7,25 +7,21 @@ import IkpAbi from '../../contractArtifacts/IKP.json';
 import DcpCheckerAbi from '../../contractArtifacts/DCPChecker.json';
 import RPReactionAbi from '../../contractArtifacts/RPReaction.json';
 
-// import "toastify-js/src/toastify.css"
-// import Toastify from 'toastify-js'
-
-
-import toasts from './toast'
+import toasts from './utils/toast';
+import { DcpStatus } from './components/dcpStatus';
+import { CaStatus } from './components/caStatus';
+import { RpHash } from './components/rpHash';
+import { AccountOptions } from './components/accountOptions';
 
 const IKP = contract(IkpAbi);
 const DCPChecker = contract(DcpCheckerAbi);
 const RPReaction = contract(RPReactionAbi);
 
-const accounts = {
-  ikpOwner: null,
-  domain: null,
-  ca1: null,
-  ca2: null,
-  ca3: null
-};
-
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+let ikpOwnerAddr;
+let currentAccount;
+const accountBalances = {};
+let accountAddress;
+const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:7545'));
 
 IKP.setProvider(web3.currentProvider);
 DCPChecker.setProvider(web3.currentProvider);
@@ -35,25 +31,59 @@ let ikpDeployed;
 let dcpCheckerDeployed;
 let rpReactionDeployed;
 
+
+const updateAllBalances = async(_addresses) => {
+  await Promise.all(_addresses.map((_addr, _i) => web3.eth.getBalance(_addr, (err, bal) => {
+    if (err) {
+      console.log(`getBalance error: ${err}`);
+    } else {
+      accountBalances[_addr] = bal;
+      console.log(`Balance [${_addr}]: ${web3.utils.fromWei(bal, "ether")}`);
+      $(`#account-balance-${_i}`)?.text(`${web3.utils.fromWei(bal, "ether")} ETH`);
+    }
+  })));
+}
+
+// const subscribeToAllBalance = (_addresses) => {
+//      web3.eth.subscribe('newBlockHeaders').on('data', (data) => {
+//       console.log('have new block')
+//       updateAllBalances(_address)
+//     }).on('error', console.log);
+// }
+
+
+
 window.App = {
   start: async() => {
-    const _accounts = await web3.eth.getAccounts();
-    if(_.isEmpty(_accounts)) alert("No accounts found, please check blockchain connection settings.");
-    Object.keys(accounts).forEach((key, i) => {
-      accounts[key] = _accounts[i]
+    accountAddress = await web3.eth.getAccounts();
+    if(_.isEmpty(accountAddress)) toasts.error("No accounts found, please check blockchain connection settings.");
+    ikpOwnerAddr = accountAddress[0];
+    currentAccount = accountAddress[0];
+    // subscribeToAllBalance(accountAddress);
+    await updateAllBalances(accountAddress);
+
+    $('#current-account').append(AccountOptions(accountAddress))
+    $('#current-account').change(() => {
+      currentAccount = $('#current-account').val()
+      console.log(currentAccount)
     })
-    console.log(accounts);
+
+    console.log(accountAddress);
     ikpDeployed = await IKP.deployed();
     dcpCheckerDeployed = await DCPChecker.deployed();
     rpReactionDeployed = await RPReaction.deployed();
 
+    if(dcpCheckerDeployed.address) {
+      $('#dcp-checker-contract-address').empty().append(dcpCheckerDeployed.address);
+    }
+    if(rpReactionDeployed.address) {
+      $('#rp-reaction-contract-address').empty().append(rpReactionDeployed.address);
+    }
     //TODO: Show accounts name and balance on web UI
 
   },
 
-  refreshBalance: () => {
 
-  },
 
   registerDomain: async() => {
     const domainName = $("#registerDomain_domainName").val()
@@ -61,36 +91,29 @@ window.App = {
     const publicKeys = $("#registerDomain_publicKeys").val()
 
     const publicKeyList = _.map(publicKeys.split(","), _key => _key.trim());
-    console.log(publicKeyList)
+    
     const result = await ikpDeployed.registerDomain(
       domainName, 
       checkerAddress, 
       publicKeyList, 
-      { from:accounts.domain, value:web3.utils.toWei('1', "ether")}
-    );
-    if(!_.isEmpty(result)) toasts.success();
-    console.log(result)
+      { from: currentAccount, value:web3.utils.toWei('1', "ether")}
+    ).catch(console.log);
+
+    if(_.isEmpty(result)) {
+      toasts.error('Action failed');
+      return;
+    }
+
+    await updateAllBalances(accountAddress);
+
+    const accountIndex = accountAddress.findIndex(_addr => _addr = currentAccount);
+    const newDcpRecord = DcpStatus(domainName, currentAccount, accountIndex, web3.utils.fromWei(`${accountBalances[currentAccount]}`, 'ether'), publicKeyList);
+    
+    $('#dcp_fields').children() ?? empty();
+    $('#dcp_fields').append(newDcpRecord)
+
+    toasts.success('Action succeeded');
   },
-
-  purchaseRp: () => {
-    var self = this;
-    var ikp;
-    var RPHash = document.getElementById("RPHash").value;
-    var RPissuer = document.getElementById("RPissuer").value;
-
-    IKP.deployed().then((instance) => {
-      ikp = instance;
-      return ikp.purchaseRp.call(RPHash,RPissuer,{from:account});
-    }).then((value) => {
-      // var greetWord = document.getElementById("balance");
-      // greetWord.innerHTML = value.valueOf();
-    }).catch((e) => {
-      console.log(e);
-      self.setStatus("Error getting greet word; see log.");
-    });
-  },
-
-  revokeRpPurchase: () => {},
 
   registerCa: () => {
     var self = this;
@@ -110,6 +133,44 @@ window.App = {
       console.log(e);
       self.setStatus("Error getting greet word; see log.");
     });
+  },
+
+  purchaseRp: async() => {
+    const domainName = $('#purchase_domainName');
+    const issuerCa = $('#purchase_rpIssuer');
+    const rpReactionAddr = $('#purchase_reactionAddress');
+
+    const result = await ikpDeployed.purchaseRp(
+      domainName, 
+      issuerCa, 
+      rpReactionAddr, 
+      { from: currentAccount, value:web3.utils.toWei('3', "ether")}
+    ).catch(console.log);;
+
+    if(_.isEmpty(result)) {
+      toasts.error('Action failed');
+      return;
+    }
+    await updateAllBalances(accountAddress);
+    console.log(result)
+    $('#revokeRpPurchase').append(RpHash(result))
+    toasts.success('Action succeeded');    
+  },
+
+  revokeRpPurchase: async() => {
+    const rpHash = $('#revokePurchase_rpHash');
+    const result = await ikpDeployed.revokeUnconfirmedRpPurchase(
+      rpHash,
+      { from: currentAccount }
+    ).catch(console.log);;
+
+    if(_.isEmpty(result)) {
+      toasts.error('Action failed');
+      return;
+    }
+    await updateAllBalances(accountAddress);
+    $('#revokeRpPurchase').append(RpHash(result))
+    toasts.success('Action succeeded');    
   },
 
   issueRP: () => {
@@ -165,41 +226,6 @@ window.App = {
     });
   },
 
-  commitReport: () => {
-    var self = this;
-    var ikp;
-    var cert = document.getElementById("cert").value;
-    var nonce = document.getElementById("nonce").value;
-
-    IKP.deployed().then((instance) => {
-      ikp = instance;
-      return ikp.reportCommit.call(cert,nonce,{from:account});
-    }).then((value) => {
-      // var greetWord = document.getElementById("balance");
-      // greetWord.innerHTML = value.valueOf();
-    }).catch((e) => {
-      console.log(e);
-      self.setStatus("Error getting greet word; see log.");
-    });
-  },
-
-  revealReport: () => {
-    var self = this;
-    var ikp;
-    var cert = document.getElementById("cert").value;
-    var nonce = document.getElementById("nonce").value;
-
-    IKP.deployed().then((instance) => {
-      ikp = instance;
-      return ikp.reportReveal.call(cert,nonce, {from:account});
-    }).then((value) => {
-      // var greetWord = document.getElementById("balance");
-      // greetWord.innerHTML = value.valueOf();
-    }).catch((e) => {
-      console.log(e);
-      self.setStatus("Error getting greet word; see log.");
-    });
-  },
 };
 
 window.addEventListener('load', () => {

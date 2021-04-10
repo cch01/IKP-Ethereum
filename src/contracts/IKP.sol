@@ -56,6 +56,8 @@ contract IKP {
     mapping(bytes32 => PendingRpPurchase) private pendingRpPurchaseMapping;
     mapping(bytes32 => ReportRecord) private reportRecords;
     
+    event NewTransaction(string message);
+
     function registerCa (string memory _name, string[] memory _pks) public payable {
         require(msg.value >= registerCaFee, "Not enough registration fee.");
         require(!caList[_name].inUse, "This account already in use.");
@@ -67,6 +69,7 @@ contract IKP {
         caList[_name] = newCa;
         caPubKeys[_name] = _pks;
         caBalances[_name] = msg.value;
+        emit NewTransaction('Domain registered.');
     }
     //Use "getRpHash" to obtain rpHash to query desired RP status
     function getRpHash(string memory _dname, string memory _cname) public pure returns (bytes32 rpHash){
@@ -83,6 +86,7 @@ contract IKP {
         });
         dcpList[_name] = newDcp;
         dcpPubKeys[_name] = _ligitimateKeys;
+        emit NewTransaction('CA registered.');
     }
 
     function issueRp (string memory _dname, string memory _cname, address _reactionContractAddress) public payable {
@@ -104,6 +108,8 @@ contract IKP {
         caBalances[_cname] += msg.value;
         msg.sender.transfer(pendingRpPurchaseMapping[_rpHash].amount);
         delete pendingRpPurchaseMapping[_rpHash];
+
+        emit NewTransaction('RP issued.');
     }
 
     function purchaseRp (string memory _dname, string memory _cname, address _reactionContractAddress) public payable returns (bytes32 rpHash) {
@@ -113,6 +119,8 @@ contract IKP {
       require(pendingRpPurchaseMapping[_rpHash].purchasedAt == 0, "Unconfirmed purchase record exist. Revoke purchase record before buying again if needed.");
       PendingRpPurchase memory newPendingRpPurchase = PendingRpPurchase({ cname:_cname, amount:msg.value, domainAddr: msg.sender, purchasedAt: block.timestamp, rpReactionAddr:_reactionContractAddress });
       pendingRpPurchaseMapping[_rpHash] = newPendingRpPurchase;
+
+      emit NewTransaction('RP purchased.');
       return _rpHash;
     }
 
@@ -120,6 +128,7 @@ contract IKP {
       require(msg.sender == pendingRpPurchaseMapping[_rpHash].domainAddr, "No purchase record found.");
       msg.sender.transfer(pendingRpPurchaseMapping[_rpHash].amount);
       delete pendingRpPurchaseMapping[_rpHash];
+      emit NewTransaction('RP purchase revoked.');
     }
 
 
@@ -128,6 +137,8 @@ contract IKP {
         bytes32 _reportHash = keccak256(abi.encodePacked(_dname, _cname, _key, msg.sender));
         require(reportRecords[_reportHash].reporter == address(0), "This report has been submitted by others.");
         reportRecords[_reportHash] = ReportRecord({ reporter: msg.sender, reportedAt: block.timestamp });
+        emit NewTransaction('Cert Report committed.');
+
     }
 
     function revealReport (string memory _dname, string memory _cname, string memory _key) public {
@@ -161,6 +172,7 @@ contract IKP {
         caBalances[_cname] -= rpMinimumPrice;
         delete rpList[_rpHash];
         delete reportRecords[keccak256(abi.encodePacked(_dname, _cname, _key, msg.sender))];
+        emit NewTransaction('Cert Report revealed.');
     }
 
 }

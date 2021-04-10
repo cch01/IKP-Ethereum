@@ -1,0 +1,1 @@
+export const AccountOptions = (_accs) => _accs.map(_ac => `<option value="${_ac}">${_ac}</option>`).join('<br>');

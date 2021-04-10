@@ -33,14 +33,20 @@
     font-size: 1.2rem;
 }
 
+.custom-field-title {
+  color: white;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
 .custom-output-label {
     color: white;
     font-weight: bold;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 }
 
 .custom-output {
-    color: white;
+    color: black;
     font-weight: bold;
     font-size: 1.3rem;
 }
