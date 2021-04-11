@@ -12,5 +12,10 @@ export default {
     text: text ?? "Failed",
     backgroundColor: "red",
     duration: 5000,
+  }).showToast(),
+
+  info: (text) => Toastify({
+    text: text ?? "Caution",
+    class: "info"
   }).showToast()
 }

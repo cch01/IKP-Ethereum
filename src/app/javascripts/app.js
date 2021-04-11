@@ -56,7 +56,7 @@ const updateAllIkpCaBalances = async(_caNames) =>
       ikpCaBalances[_caName] = bal;
       console.log(`IKP Balance [${_caName}]: ${web3.utils.fromWei(`${bal}`, "ether")}`);
       $(`.ikp-ca-balance-${_caName}`)?.text(`${web3.utils.fromWei(`${bal}`, "ether")} ETH`);
-    })
+    }).catch(console.error)
   ));
 
 window.App = {
@@ -120,7 +120,7 @@ window.App = {
 
     //Hot fix for occasional batch balance update bug
     accountBalances[currentAccount] = ethBalance;
-    $('#current-account-balance').empty().append(`${web3.utils.fromWei(accountBalances[currentAccount], 'ether')} ETH`)
+    $('#current-account-balance').empty().append(`${ethBalToEther} ETH`)
 
     const accountIndex = accountAddresses.findIndex(_addr => _addr == currentAccount);
     const newDcpRecord = DcpStatus(domainName, currentAccount, accountIndex, ethBalToEther, publicKeyList);
@@ -176,7 +176,7 @@ window.App = {
 
     //Hot fix for occasional batch balance update bug
     accountBalances[currentAccount] = ethBalance;
-    $('#current-account-balance').empty().append(`${web3.utils.fromWei(accountBalances[currentAccount], 'ether')} ETH`)
+    $('#current-account-balance').empty().append(`${ethBalToEther} ETH`)
 
     const ikpBalance = await ikpDeployed.caBalances(caName);
     const ikpBalToEther = web3.utils.fromWei(`${ikpBalance}`, 'ether');
@@ -288,6 +288,12 @@ window.App = {
     await updateAllEthBalances( _.keys(accountBalances));
     await updateAllIkpCaBalances(_.keys(ikpCaBalances));
 
+    //Hot fix for occasional batch balance update bug
+    const ethBalance = await web3.eth.getBalance(currentAccount)
+    const ethBalToEther = web3.utils.fromWei(`${ethBalance}`, 'ether');
+    accountBalances[currentAccount] = ethBalance;
+    $('#current-account-balance').empty().append(`${ethBalToEther} ETH`)
+        
     $('#rp-list-placeholder').addClass('d-none');
     $('#rp-list-fields').append(RpTableRow(domainName, caName, rpReactionAddr));
     $('#rp-list-container').removeClass('d-none').addClass('d-block');
@@ -311,6 +317,12 @@ window.App = {
     }    
     
     await updateAllEthBalances( _.keys(accountBalances));
+    //Hot fix for occasional batch balance update bug
+    const ethBalance = await web3.eth.getBalance(currentAccount)
+    const ethBalToEther = web3.utils.fromWei(`${ethBalance}`, 'ether');
+    accountBalances[currentAccount] = ethBalance;
+    $('#current-account-balance').empty().append(`${ethBalToEther} ETH`)
+    
     toasts.success('Action succeeded');
   },
 
@@ -327,11 +339,10 @@ window.App = {
       toasts.error('Action failed');
       return;
     }    
-    console.log(result.logs[0].args?.message)
-    const rpClaimed = result.logs[0].args?.message === "Cert Report revealed.";
-    console.log(rpClaimed)
+    const rpClaimed = result.logs[0]?.args?.message === "Cert Report revealed.";
 
     if(rpClaimed){
+      toasts.info('Abnormal Cert certified.');
       $(`#${domainName}-${caName}-rp`).remove();
       const rpListContainer = $('#rp-list-container');
       if(rpListContainer.children().length === 1) {
@@ -342,6 +353,12 @@ window.App = {
 
     await updateAllEthBalances( _.keys(accountBalances));
     await updateAllIkpCaBalances(_.keys(ikpCaBalances));
+
+    //Hot fix for occasional batch balance update bug
+    const ethBalance = await web3.eth.getBalance(currentAccount)
+    const ethBalToEther = web3.utils.fromWei(`${ethBalance}`, 'ether');
+    accountBalances[currentAccount] = ethBalance;
+    $('#current-account-balance').empty().append(`${ethBalToEther} ETH`)
 
     toasts.success('Action succeeded');
   },

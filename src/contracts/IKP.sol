@@ -54,7 +54,7 @@ contract IKP {
     mapping(string => string[]) public dcpPubKeys;
 
     mapping(bytes32 => RP) public rpList;
-    mapping(bytes32 => PendingRpPurchase) private pendingRpPurchaseMapping;
+    mapping(bytes32 => PendingRpPurchase) public pendingRpPurchaseMapping;
     mapping(bytes32 => ReportRecord) private reportRecords;
     
     event NewTransaction(string message);
@@ -146,16 +146,18 @@ contract IKP {
     }
 
 
-    function commitReport (string memory _dname, string memory _cname, string memory _key) public payable {
+    function commitReport (string memory _dname, string memory _cname, string memory _key) public payable returns (bytes32) {
         require(msg.value == reportFee, "Please submit exact report fee.");
         bytes32 _reportHash = keccak256(abi.encodePacked(_dname, _cname, _key, msg.sender));
         require(reportRecords[_reportHash].reporter == address(0), "This report has been submitted by others.");
         reportRecords[_reportHash] = ReportRecord({ reporter: msg.sender, reportedAt: block.timestamp });
         emit NewTransaction('Cert Report committed.');
+        return _reportHash;
     }
 
     function revealReport (string memory _dname, string memory _cname, string memory _key) public {
-        require(reportRecords[keccak256(abi.encodePacked(_dname, _cname, _key, msg.sender))].reporter == msg.sender, "Permission denined.");
+        bytes32 reportHash = keccak256(abi.encodePacked(_dname, _cname, _key, msg.sender));
+        require(reportRecords[reportHash].reporter == msg.sender, "Permission denined.");
         bytes32 _rpHash = keccak256(abi.encodePacked(_dname, _cname)); 
         
         // If no domain name / ca name matched, return the report fee to reporter
@@ -163,6 +165,7 @@ contract IKP {
           || keccak256(abi.encodePacked(caList[_cname].name)) != keccak256(abi.encodePacked(_cname)))
          {
             msg.sender.transfer(reportFee);
+            delete reportRecords[reportHash];
             return;
         }
 
@@ -170,14 +173,14 @@ contract IKP {
         bytes32 ligitimateDnameCnameHash = keccak256(abi.encodePacked(rpList[_rpHash].domainName, rpList[_rpHash].cname));
 
         if(dnameCnameHash != ligitimateDnameCnameHash) {
-          delete reportRecords[keccak256(abi.encodePacked(_dname, _cname, _key, msg.sender))];
+          delete reportRecords[reportHash];
           return;
         }
 
         bool isCertValid = dcpList[_dname].checker.check(dcpPubKeys[_dname], _key, caPubKeys[_cname]);
 
         if(isCertValid) {
-          delete reportRecords[keccak256(abi.encodePacked(_dname, _cname, _key, msg.sender))];
+          delete reportRecords[reportHash];
           return;
         }
 
@@ -194,7 +197,7 @@ contract IKP {
         delete rpList[_rpHash];
 
         // Delete report records after it has been processed
-        delete reportRecords[keccak256(abi.encodePacked(_dname, _cname, _key, msg.sender))];
+        delete reportRecords[reportHash];
         emit NewTransaction('Cert Report revealed.');
     }
 
