@@ -40,10 +40,11 @@ contract IKP {
       uint reportedAt;
     }
 
-    uint public reportFee = 3 ether; 
-    uint public rpMinimumPrice = 15 ether; 
     uint public domainRegisterFee = 1 ether;
     uint public registerCaFee = 1 ether;
+    uint public reportFee = 3 ether; 
+
+    uint public rpMinimumPrice = 15 ether; 
 
     mapping(string => CA) public caList;
     mapping(string => string[]) public caPubKeys;
@@ -58,6 +59,7 @@ contract IKP {
     
     event NewTransaction(string message);
     event RpPurchased(bytes32 rpHash);
+
     function registerCa (string memory _name, string[] memory _pks) public payable {
         require(msg.value >= registerCaFee, "Not enough registration fee.");
         require(!caList[_name].inUse, "This account already in use.");
@@ -70,9 +72,20 @@ contract IKP {
         caPubKeys[_name] = _pks;
         emit NewTransaction('Domain registered.');
     }
+
     //Use "getRpHash" to obtain rpHash to query desired RP status
     function getRpHash(string memory _dname, string memory _cname) public pure returns (bytes32 rpHash){
       return keccak256(abi.encodePacked(_dname, _cname));
+    }
+
+    //Use "getDcpPubKeys" to query desired dcp keys
+    function getDcpPubKeys(string memory _dname) public view returns (string[] memory) {
+      return dcpPubKeys[_dname];
+    }
+
+    //Use "getCaPubKeys" to query desired Ca keys
+    function getCaPubKeys(string memory _cname) public view returns (string[] memory) {
+      return caPubKeys[_cname];
     }
 
     function registerDomain (string memory _name, address _checkerFunctionAddress, string[] memory _ligitimateKeys) public payable {
@@ -90,12 +103,12 @@ contract IKP {
 
     function issueRp (string memory _dname, string memory _cname, address _reactionContractAddress) public payable {
         require(msg.value >= rpMinimumPrice, "Not enough RP issue fee.");
-
+        
         bytes32 _rpHash = keccak256(abi.encodePacked(_dname, _cname));
-        require((keccak256(abi.encodePacked(_cname)) == keccak256(abi.encodePacked(pendingRpPurchaseMapping[_rpHash].cname))
-         && _reactionContractAddress == pendingRpPurchaseMapping[_rpHash].rpReactionAddr)
-          && (msg.sender == caList[_cname].paymentAccount)
-            , "CA not registered / Wrong Address for the CA.");
+        
+        require(keccak256(abi.encodePacked(_cname)) == keccak256(abi.encodePacked(pendingRpPurchaseMapping[_rpHash].cname)), "No RP purchase record found for this CA");
+        require(_reactionContractAddress == pendingRpPurchaseMapping[_rpHash].rpReactionAddr, "RP Reaction address not match.");
+        require(msg.sender == caList[_cname].paymentAccount, "CA not registered / You are not the target CA.");
 
         RP memory rp = RP({
           domainName: _dname,
@@ -105,6 +118,8 @@ contract IKP {
 
         rpList[_rpHash] = rp;
         caBalances[_cname] += msg.value;
+
+        // Execute pending transaction from domain to CA
         msg.sender.transfer(pendingRpPurchaseMapping[_rpHash].amount);
         delete pendingRpPurchaseMapping[_rpHash];
 
@@ -137,18 +152,20 @@ contract IKP {
         require(reportRecords[_reportHash].reporter == address(0), "This report has been submitted by others.");
         reportRecords[_reportHash] = ReportRecord({ reporter: msg.sender, reportedAt: block.timestamp });
         emit NewTransaction('Cert Report committed.');
-
     }
 
     function revealReport (string memory _dname, string memory _cname, string memory _key) public {
         require(reportRecords[keccak256(abi.encodePacked(_dname, _cname, _key, msg.sender))].reporter == msg.sender, "Permission denined.");
         bytes32 _rpHash = keccak256(abi.encodePacked(_dname, _cname)); 
+        
+        // If no domain name / ca name matched, return the report fee to reporter
         if (keccak256(abi.encodePacked(rpList[_rpHash].domainName)) != keccak256(abi.encodePacked(_dname))
           || keccak256(abi.encodePacked(caList[_cname].name)) != keccak256(abi.encodePacked(_cname)))
          {
             msg.sender.transfer(reportFee);
             return;
         }
+
         bytes32 dnameCnameHash = keccak256(abi.encodePacked(_dname, _cname));
         bytes32 ligitimateDnameCnameHash = keccak256(abi.encodePacked(rpList[_rpHash].domainName, rpList[_rpHash].cname));
 
@@ -164,6 +181,7 @@ contract IKP {
           return;
         }
 
+        // Transfer money to entities using the rpMinimumPrice that CA submitted when issuing RP
         rpList[_rpHash].reaction.trigger{value:rpMinimumPrice}(
           msg.sender, 
           caList[_cname].paymentAccount,
@@ -171,7 +189,11 @@ contract IKP {
 				);
 
         caBalances[_cname] -= rpMinimumPrice;
+
+        // Delete RP after it has been claimed
         delete rpList[_rpHash];
+
+        // Delete report records after it has been processed
         delete reportRecords[keccak256(abi.encodePacked(_dname, _cname, _key, msg.sender))];
         emit NewTransaction('Cert Report revealed.');
     }

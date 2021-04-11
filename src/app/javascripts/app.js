@@ -1,7 +1,7 @@
 import { default as Web3} from 'web3';
 import { default as contract } from 'truffle-contract';
 import _ from 'lodash';
-import $ from './jquery-3.6.0.min';
+import $ from './assets/jquery-3.6.0.min';
 
 import IkpAbi from '../../contractArtifacts/IKP.json';
 import DcpCheckerAbi from '../../contractArtifacts/DCPChecker.json';
@@ -58,16 +58,6 @@ const updateAllIkpCaBalances = async(_caNames) =>
       $(`.ikp-ca-balance-${_caName}`)?.text(`${web3.utils.fromWei(`${bal}`, "ether")} ETH`);
     })
   ));
-
-
-// const subscribeToAllBalance = (_addresses) => {
-//      web3.eth.subscribe('newBlockHeaders').on('data', (data) => {
-//       console.log('have new block')
-//       updateAllEthBalances(_address)
-//     }).on('error', console.log);
-// }
-
-
 
 window.App = {
   start: async() => {
@@ -128,8 +118,32 @@ window.App = {
     const ethBalance = await web3.eth.getBalance(currentAccount)
     const ethBalToEther = web3.utils.fromWei(`${ethBalance}`, 'ether');
 
+    //Hot fix for occasional batch balance update bug
+    accountBalances[currentAccount] = ethBalance;
+    $('#current-account-balance').empty().append(`${web3.utils.fromWei(accountBalances[currentAccount], 'ether')} ETH`)
+
     const accountIndex = accountAddresses.findIndex(_addr => _addr == currentAccount);
     const newDcpRecord = DcpStatus(domainName, currentAccount, accountIndex, ethBalToEther, publicKeyList);
+    
+    $('#dcp-placeholder').remove();
+    $('#dcp-fields').append(newDcpRecord)
+
+    toasts.success('Action succeeded');
+  },
+
+  retrieveDomain: async() => {
+    const domainName = $('#retrieveDomain_domainName').val();
+    const dcpResult = await ikpDeployed.dcpList(domainName).catch(console.error);
+    const keys = await ikpDeployed.getDcpPubKeys(domainName)
+
+    if(!dcpResult.inUse || _.isEmpty(keys)) {
+      toasts.error('DCP record / keys not found.');
+      return;
+    }
+
+    const accountIndex = _.keys(accountBalances).findIndex(_addr => _addr == dcpResult.paymentAccount);
+    const ethBalToEther = web3.utils.fromWei(accountBalances[dcpResult.paymentAccount], 'ether');
+    const newDcpRecord = DcpStatus(domainName, dcpResult.paymentAccount, accountIndex, ethBalToEther, keys);
     
     $('#dcp-placeholder').remove();
     $('#dcp-fields').append(newDcpRecord)
@@ -160,6 +174,10 @@ window.App = {
     const ethBalance = await web3.eth.getBalance(currentAccount)
     const ethBalToEther = web3.utils.fromWei(`${ethBalance}`, 'ether');
 
+    //Hot fix for occasional batch balance update bug
+    accountBalances[currentAccount] = ethBalance;
+    $('#current-account-balance').empty().append(`${web3.utils.fromWei(accountBalances[currentAccount], 'ether')} ETH`)
+
     const ikpBalance = await ikpDeployed.caBalances(caName);
     const ikpBalToEther = web3.utils.fromWei(`${ikpBalance}`, 'ether');
     ikpCaBalances[caName] = ikpBalance;
@@ -171,7 +189,26 @@ window.App = {
     $('#ca-fields').append(newCaRecord)
 
     toasts.success('Action succeeded');
+  },
+
+  retrieveCa: async() => {
+    const caName = $('#retrieveCa_caName').val();
+    const caResult = await ikpDeployed.caList(caName).catch(console.error);
+    const keys = await ikpDeployed.getCaPubKeys(caName)
+
+    if(!caResult.inUse || _.isEmpty(keys)) {
+      toasts.error('CA record / keys not found.');
+      return;
+    }
+
+    const accountIndex = _.keys(accountBalances).findIndex(_addr => _addr == caResult.paymentAccount);
+    const ethBalToEther = web3.utils.fromWei(accountBalances[caResult.paymentAccount], 'ether');
+    const newCaRecord = DcpStatus(caName, caResult.paymentAccount, accountIndex, ethBalToEther, keys);
     
+    $('#ca-placeholder').remove();
+    $('#ca-fields').append(newCaRecord)
+
+    toasts.success('Action succeeded');
   },
 
   purchaseRp: async() => {
@@ -196,6 +233,21 @@ window.App = {
 
     await updateAllEthBalances(_.keys(accountBalances));
     $('#rp-purchase-form').append(RpHash(rpHash))
+    toasts.success('Action succeeded');    
+  },
+
+  retrieveRpHash: async() => {
+    const domainName = $('#retrieveRpHash_domainName').val();
+    const caName = $('#retrieveRpHash_rpIssuer').val();
+
+    const rpHash = await ikpDeployed.getRpHash(domainName, caName);
+
+    if(_.isEmpty(rpHash)) {
+      toasts.error('Something went wrong.');
+      return;
+    }
+
+    $('#rp-hash-form').append(RpHash(rpHash))
     toasts.success('Action succeeded');    
   },
 

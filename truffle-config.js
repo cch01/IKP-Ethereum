@@ -47,19 +47,7 @@
       network_id: "5777",       // Any network (default: none)
       websockets: true
      },
-     rinkeby: {
-       provider: function() {
-        return new HDWalletProvider(
-           'boil horse setup suggest attack tired confirm crater hero churn manual omit',
-           "https://rinkeby.infura.io/v3/86bd0466243e44258e1ae54c1f96d2de"
-         );
-       },
-       network_id: 4,
-       gas: 6612388,
-       gasPrice: 10000000000,
-       skipDryRun: true
-      }
-    
+   
      // Another network with more advanced options...
      // advanced: {
      // port: 8777,             // Custom port
