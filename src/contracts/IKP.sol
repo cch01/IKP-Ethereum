@@ -40,7 +40,7 @@ contract IKP {
       uint reportedAt;
     }
 
-    uint public reportFee = 5 ether; 
+    uint public reportFee = 3 ether; 
     uint public rpMinimumPrice = 15 ether; 
     uint public domainRegisterFee = 1 ether;
     uint public registerCaFee = 1 ether;
@@ -68,7 +68,6 @@ contract IKP {
         });
         caList[_name] = newCa;
         caPubKeys[_name] = _pks;
-        caBalances[_name] = msg.value;
         emit NewTransaction('Domain registered.');
     }
     //Use "getRpHash" to obtain rpHash to query desired RP status
@@ -144,7 +143,9 @@ contract IKP {
     function revealReport (string memory _dname, string memory _cname, string memory _key) public {
         require(reportRecords[keccak256(abi.encodePacked(_dname, _cname, _key, msg.sender))].reporter == msg.sender, "Permission denined.");
         bytes32 _rpHash = keccak256(abi.encodePacked(_dname, _cname)); 
-        if (keccak256(abi.encodePacked(rpList[_rpHash].domainName)) != keccak256(abi.encodePacked(_dname))) {
+        if (keccak256(abi.encodePacked(rpList[_rpHash].domainName)) != keccak256(abi.encodePacked(_dname))
+          || keccak256(abi.encodePacked(caList[_cname].name)) != keccak256(abi.encodePacked(_cname)))
+         {
             msg.sender.transfer(reportFee);
             return;
         }

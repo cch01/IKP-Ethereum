@@ -33,20 +33,30 @@
     font-size: 1.2rem;
 }
 
-.custom-field-title {
-  color: white;
-  font-weight: bold;
-  font-size: 1.3rem;
-}
-
 .custom-output-label {
     color: white;
     font-weight: bold;
     font-size: 1.3rem;
 }
 
-.custom-output {
+.custom-output{
     color: black;
     font-weight: bold;
     font-size: 1.3rem;
+}
+
+.custom-table-cell  {
+  color: black;
+  font-weight: bold;
+  font-size: 1.3rem;
+  padding: 12px;
+  text-align: left;
+}
+
+.custom-table-header {
+  padding: 12px;
+  text-align: left;
+  color: white;
+  font-weight: bold;
+  font-size: 1.3rem;
 }

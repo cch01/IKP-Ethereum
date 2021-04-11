@@ -36,10 +36,11 @@
                 <li class="nav-item mx-3" data-menuanchor="checkingReportCert">
                     <a class="nav-link active" href="#checkingReportCert">Report</a>
                 </li>
-                <li style="width: 100%; text-align: right">
+                <li>
                   <span class="nav-link active">Current Account:                   
                     <select id="current-account" style="display: inline-block">
                     </select>
+                    <div style="display: inline-block" id="current-account-balance"></div>
                   </span>
                 </li>
             </ul>
@@ -49,9 +50,10 @@
 <div id="fullpage" id="myMenu">
     <!--    Status Section-->
     <div class="section">
+      <div class="slide" data-anchor="status">
         <div class="container justify-content-center d-flex">
             <div class="col-sm-12 col-lg-11 align-self-center">
-                <div class="card bg-transparent"
+                <div class="card bg-transparent p-3 px-5 p-3 px-5"
                      style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
                     <div class="row mb-4">
                         <div class="text-white section-title">Contract status</div>
@@ -69,25 +71,57 @@
                       </div>
                     </div>
                     <hr style="margin:15px 20%; color: white">
-                    <div class="d-flex" style="margin-bottom: 15px;" >
-                      <div id="ca-fields" style="width: 100%;">
-                        <div style="width: 100%;" class="custom-output-label">No Domain Registered</div>
-                      </div>
-                      <div id="dcp-fields" style="width: 100%;">
-                        <div style="width: 100%;" class="custom-output-label">No CA registered</div>
+                    <div class="d-flex flex-column" style="margin-bottom: 15px;" >
+                      <div class="text-white section-title">Reaction Policy List</div>
+                      <div style="width: 100%;" id="rp-list-placeholder" class="my-3 custom-output">No Reaction Policy Registered</div>
+                      <div id="rp-list-container" class="d-none" style="border: 1px solid white; border-radius: 15px;">  
+                        <table id="rp-list-fields" class="d-table" style="width: 100%;">
+                          <tr>
+                            <th class="custom-table-header">Domain</th>
+                            <th class="custom-table-header">CA</th>
+                            <th class="custom-table-header">RP address</th>
+                          </tr>
+                        </table>
                       </div>
                     </div>
                 </div>
             </div>
         </div>
+      </div>
+      <div class="slide" data-anchor="entities">
+        <div class="container justify-content-center d-flex">
+            <div class="col-sm-12 col-lg-11 align-self-center">
+                <div class="card bg-transparent p-3 px-5"
+                     style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
+                    <div class="row mb-4">
+                        <div class="text-white section-title">Registered Entities</div>
+                    </div>
+                    <div class="d-flex" style="margin-bottom: 15px;" >
+                      <div style="width: 100%">
+                        <div style="width: 100%;" class="custom-output-label py-3">DCP List</div>
+                        <div id="dcp-fields" style="width: 100%;">
+                          <div style="width: 100%;" id="dcp-placeholder" class="custom-output">No Domain Registered</div>
+                        </div>
+                      </div>
+                      <div style="width: 100%">
+                        <div style="width: 100%;" class="custom-output-label py-3">CA List</div>
+                        <div id="ca-fields" style="width: 100%;">
+                          <div style="width: 100%;" id="ca-placeholder" class="custom-output">No CA registered</div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
     </div>
     <!--    Domain -->
     <div class="section">
         <!--        Domain Register Slide-->
-        <div class="slide" data-anchor="slide1">
+        <div class="slide" data-anchor="domain-register">
             <div class="container justify-content-center d-flex">
                 <div class="col-sm-8 align-self-center">
-                    <div class="card bg-transparent"
+                    <div class="card bg-transparent p-3 px-5"
                          style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
                         <div class="row mb-4">
                             <div class="text-white section-title pb-10">Domain Register</div>
@@ -97,29 +131,29 @@
                                 <div class="row ikp-form">
                                     <div class="row my-1">
                                         <label for="registerDomain_domainName"
-                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                               class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                             <span class="custom-input-label">Domain Name:</span></label>
-                                        <div class="col-sm-8">
+                                        <div class="col-sm-7">
                                             <input type="text" class="form-control" id="registerDomain_domainName">
                                         </div>
                                     </div>
                                     <div class="row my-1">
                                         <label for="registerDomain_checkerAddress"
-                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                               class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                             <span class="custom-input-label">Checker Function Address:</span></label>
-                                        <div class="col-sm-8">
+                                        <div class="col-sm-7">
                                             <input type="text" class="form-control" id="registerDomain_checkerAddress">
                                         </div>
                                     </div>
                                     <div class="row my-1">
                                         <label for="registerDomain_publicKeys"
-                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                               class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                             <span class="custom-input-label">Keys:</span></label>
-                                        <div class="col-sm-8">
+                                        <div class="col-sm-7">
                                             <input type="text" class="form-control" id="registerDomain_publicKeys">
                                         </div>
                                     </div>
-                                    <div class="d-flex flex-row justify-content-center">
+                                    <div class="d-flex flex-row justify-content-center mt-4">
                                         <button class="btn btn-light my-3 custom-form-btn" id="registerDomain"
                                                 onclick="App.registerDomain()">Register
                                         </button>
@@ -131,11 +165,42 @@
                 </div>
             </div>
         </div>
+        <div class="slide" data-anchor="domain-retrieve">
+          <div class="container justify-content-center d-flex">
+              <div class="col-sm-8 align-self-center">
+                  <div class="card bg-transparent p-3 px-5"
+                       style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
+                      <div class="row mb-4">
+                          <div class="text-white section-title pb-10">Retrieve Registered Domain</div>
+                      </div>
+                      <div class="row">
+                          <div class="d-flex justify-content-center mb-3">
+                              <div class="row ikp-form">
+                                  <div class="row my-1">
+                                      <label for="registerDomain_domainName"
+                                             class="col-sm-5 col-form-label d-flex" style="text-align: left;">
+                                          <span class="custom-input-label">Domain Name:</span></label>
+                                      <div class="col-sm-7">
+                                          <input type="text" class="form-control" id="registerDomain_domainName">
+                                      </div>
+                                  </div>
+                                  <div class="d-flex flex-row justify-content-center mt-4">
+                                      <button class="btn btn-light my-3 custom-form-btn" id="registerDomain"
+                                              onclick="App.retrieveDomain()">Retrieve
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
         <!--        Buying RP Slide-->
-        <div class="slide" data-anchor="slide2">
+        <div class="slide" data-anchor="rp-purchase">
             <div class="container justify-content-center d-flex">
                 <div class="col-sm-8 align-self-center">
-                    <div class="card bg-transparent"
+                    <div class="card bg-transparent p-3 px-5"
                          style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
                         <div class="row mb-4">
                             <div class="text-white section-title pb-10">RP Purchasing</div>
@@ -144,31 +209,40 @@
                             <div class="d-flex justify-content-center mb-3">
                                 <div class="row ikp-form" id="rp-purchase-form">
                                     <div class="row my-1">
-                                        <label for="purchase_domainName" class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                        <label for="purchase_domainName" class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                             <span class="custom-input-label">Domain Name:</span>
                                         </label>
-                                        <div class="col-sm-8">
+                                        <div class="col-sm-7">
                                             <input type="text" class="form-control" id="purchase_domainName">
                                         </div>
                                     </div>
                                     <div class="row my-1">
                                         <label for="purchase_rpIssuer"
-                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                               class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                             <span class="custom-input-label">Issuer:</span></label>
-                                        <div class="col-sm-8">
+                                        <div class="col-sm-7">
                                             <input type="text" class="form-control" id="purchase_rpIssuer">
                                         </div>
                                     </div>
                                     <div class="row my-1">
                                       <label for="purchase_reactionAddress"
-                                             class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                             class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                           <span class="custom-input-label">Reaction Function Address:</span>
                                       </label>
-                                      <div class="col-sm-8">
+                                      <div class="col-sm-7">
                                           <input type="text" class="form-control" id="purchase_reactionAddress">
                                       </div>
                                     </div>
-                                    <div class="d-flex flex-row justify-content-center">
+                                    <div class="row my-1">
+                                      <label for="purchase_price"
+                                             class="col-sm-5 col-form-label d-flex" style="text-align: left;">
+                                          <span class="custom-input-label">Price:</span>
+                                      </label>
+                                      <div class="col-sm-7">
+                                          <input type="text" class="form-control" id="purchase_price">
+                                      </div>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-center mt-4">
                                         <button class="btn btn-light my-3 custom-form-btn" id="purchaseRp"
                                                 onclick="App.purchaseRp()">Purchase
                                         </button>
@@ -180,10 +254,10 @@
                 </div>
             </div>
         </div>
-        <div class="slide" data-anchor="slide3">
+        <div class="slide" data-anchor="revoke-unconfirmed-rp">
           <div class="container justify-content-center d-flex">
               <div class="col-sm-8 align-self-center">
-                  <div class="card bg-transparent"
+                  <div class="card bg-transparent p-3 px-5"
                        style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
                       <div class="row mb-4">
                           <div class="text-white section-title pb-10">Revoke Unconfirmed RP Purchase</div>
@@ -193,13 +267,13 @@
                               <div class="row ikp-form">
                                   <div class="row my-1">
                                       <label for="revokePurchase_rpHash"
-                                             class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                             class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                           <span class="custom-input-label">RP hash:</span></label>
-                                      <div class="col-sm-8">
+                                      <div class="col-sm-7">
                                           <input type="text" class="form-control" id="revokePurchase_rpHash">
                                       </div>
                                   </div>
-                                  <div class="d-flex flex-row justify-content-center">
+                                  <div class="d-flex flex-row justify-content-center mt-4">
                                       <button class="btn btn-light my-3 custom-form-btn" id="revokeRpPurchase"
                                               onclick="App.revokeRpPurchase()">Revoke
                                       </button>
@@ -215,10 +289,10 @@
     <!--    CA Section-->
     <div class="section">
         <!--        CA Register Slide-->
-        <div class="slide" data-anchor="slide1">
+        <div class="slide" data-anchor="ca-register">
             <div class="container justify-content-center d-flex">
                 <div class="col-sm-8 align-self-center">
-                    <div class="card bg-transparent"
+                    <div class="card bg-transparent p-3 px-5"
                          style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
                         <div class="row mb-4">
                             <div class="text-white section-title pb-10">CA
@@ -230,23 +304,23 @@
                                 <div class="row ikp-form">
                                     <div class="row my-1">
                                         <label for="registerCa_caName"
-                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                               class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                             <span class="custom-input-label">Name:</span></label>
-                                        <div class="col-sm-8">
+                                        <div class="col-sm-7">
                                             <input type="text" class="form-control"
                                                    id="registerCa_caName">
                                         </div>
                                     </div>
                                     <div class="row my-1">
-                                        <label for="registerCa_publickeys"
-                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                        <label for="registerCa_publicKeys"
+                                               class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                             <span class="custom-input-label">Public Keys:</span></label>
-                                        <div class="col-sm-8">
+                                        <div class="col-sm-7">
                                             <input type="text" class="form-control"
-                                                   id="registerCa_publickeys">
+                                                   id="registerCa_publicKeys">
                                         </div>
                                     </div>
-                                    <div class="d-flex flex-row justify-content-center">
+                                    <div class="d-flex flex-row justify-content-center mt-4">
                                         <button class="btn btn-light my-3 custom-form-btn"
                                                 id="registerCa" onclick="App.registerCa()">Register
                                         </button>
@@ -259,10 +333,10 @@
             </div>
         </div>
         <!--        CA Issue RP-->
-        <div class="slide" data-anchor="slide2">
+        <div class="slide" data-anchor="issue-rp">
             <div class="container justify-content-center d-flex">
                 <div class="col-sm-8 align-self-center">
-                    <div class="card bg-transparent"
+                    <div class="card bg-transparent p-3 px-5"
                          style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
                         <div class="row mb-4">
                             <div class="text-white section-title pb-10">CA Issue RP
@@ -273,32 +347,32 @@
                                 <div class="row ikp-form">
                                     <div class="row my-1">
                                         <label for="issueRp_domainName"
-                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                               class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                             <span class="custom-input-label">Domain Name:</span></label>
-                                        <div class="col-sm-8">
+                                        <div class="col-sm-7">
                                             <input type="text" class="form-control"
                                                    id="issueRp_domainName">
                                         </div>
                                     </div>
                                     <div class="row my-1">
                                       <label for="issueRp_caName"
-                                             class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                             class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                           <span class="custom-input-label">CA Name:</span></label>
-                                      <div class="col-sm-8">
+                                      <div class="col-sm-7">
                                           <input type="text" class="form-control"
                                                  id="issueRp_caName">
                                       </div>
                                   </div>
                                   <div class="row my-1">
                                     <label for="issueRp_reactionFunctionAddress"
-                                           class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                           class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                         <span class="custom-input-label">Reaction Function Address:</span></label>
-                                    <div class="col-sm-8">
+                                    <div class="col-sm-7">
                                         <input type="text" class="form-control"
                                                id="issueRp_reactionFunctionAddress">
                                     </div>
                                 </div>
-                                    <div class="d-flex flex-row justify-content-center">
+                                    <div class="d-flex flex-row justify-content-center mt-4">
                                         <button class="btn btn-light my-3 custom-form-btn"
                                                 id="issue" onclick="App.issueRP()">Issue
                                         </button>
@@ -314,10 +388,10 @@
     <!--    Checking Cert and Revoke List Section-->
     <div class="section">
         <!--        Report Abnormal Cert Slide-->
-        <div class="slide" data-anchor="slide1">
+        <div class="slide" data-anchor="report-cert">
             <div class="container justify-content-center d-flex">
                 <div class="col-sm-8 align-self-center">
-                    <div class="card bg-transparent"
+                    <div class="card bg-transparent p-3 px-5"
                          style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
                         <div class="row mb-4">
                             <div class="text-white section-title pb-10">
@@ -329,32 +403,32 @@
                                 <div class="row ikp-form">
                                     <div class="row my-1">
                                         <label for="commitReport_domainName"
-                                               class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                               class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                             <span class="custom-input-label">Domain Name:</span></label>
-                                        <div class="col-sm-8">
+                                        <div class="col-sm-7">
                                             <input type="text" class="form-control"
                                                    id="commitReport_domainName">
                                         </div>
                                     </div>
                                     <div class="row my-1">
                                       <label for="commitReport_caName"
-                                             class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                             class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                           <span class="custom-input-label">CA Name:</span></label>
-                                      <div class="col-sm-8">
+                                      <div class="col-sm-7">
                                           <input type="text" class="form-control"
                                                  id="commitReport_caName">
                                       </div>
                                     </div>
                                     <div class="row my-1">
                                       <label for="commitReport_key"
-                                            class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                           <span class="custom-input-label">Key in Cert:</span></label>
-                                      <div class="col-sm-8">
+                                      <div class="col-sm-7">
                                           <input type="text" class="form-control"
                                                 id="commitReport_key">
                                       </div>
                                     </div>
-                                    <div class="d-flex flex-row justify-content-center">
+                                    <div class="d-flex flex-row justify-content-center mt-4">
                                         <button class="btn btn-light my-3 custom-form-btn"
                                                 id="commitReport" onclick="App.commitReport()">Report
                                         </button>
@@ -367,10 +441,10 @@
             </div>
         </div>
         <!--        RevealReport Slide-->
-        <div class="slide" data-anchor="slide2">
+        <div class="slide" data-anchor="reveal-report">
             <div class="container justify-content-center d-flex">
                 <div class="col-sm-8 align-self-center">
-                    <div class="card bg-transparent"
+                    <div class="card bg-transparent p-3 px-5"
                          style="z-index: 999; border-width: 3px; border-color: white; border-radius: 40px;">
                         <div class="row mb-4">
                             <div class="text-white section-title pb-10">
@@ -382,32 +456,32 @@
                                 <div class="row ikp-form">
                                   <div class="row my-1">
                                     <label for="revealReport_domainName"
-                                           class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                           class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                         <span class="custom-input-label">Domain Name:</span></label>
-                                    <div class="col-sm-8">
+                                    <div class="col-sm-7">
                                         <input type="text" class="form-control"
                                                id="revealReport_domainName">
                                     </div>
                                     </div>
                                     <div class="row my-1">
                                       <label for="revealReport_caName"
-                                            class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                           <span class="custom-input-label">CA Name:</span></label>
-                                      <div class="col-sm-8">
+                                      <div class="col-sm-7">
                                           <input type="text" class="form-control"
                                                 id="revealReport_caName">
                                       </div>
                                     </div>
                                     <div class="row my-1">
                                       <label for="revealReport_key"
-                                            class="col-sm-4 col-form-label d-flex justify-content-end align-middle">
+                                            class="col-sm-5 col-form-label d-flex" style="text-align: left;">
                                           <span class="custom-input-label">Key in Cert:</span></label>
-                                      <div class="col-sm-8">
+                                      <div class="col-sm-7">
                                           <input type="text" class="form-control"
                                                 id="revealReport_key">
                                       </div>
                                     </div>
-                                    <div class="d-flex flex-row justify-content-center">
+                                    <div class="d-flex flex-row justify-content-center mt-4">
                                         <button class="btn btn-light my-3 custom-form-btn"
                                                 id="revealReport" onclick="App.revealReport()">Check
                                         </button>

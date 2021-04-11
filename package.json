@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --mode development --progress --open --hot",
-    "build": "webpack --mode production --progress"
+    "build": "webpack --mode production --progress",
+    "deploy-contracts": "truffle deploy --network development --reset"
   },
   "author": "",
   "license": "MIT",

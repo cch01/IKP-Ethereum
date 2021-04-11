@@ -21,6 +21,10 @@ Only needed to change if you are going to deploy the contract to testnet
 ```
 [npx] truffle deploy --network [profile-name in truffle-config.js]
 ```
+or
+```
+yarn deploy-contracts
+```
 ## 5. Start up the webapp
 ```
 yarn start
