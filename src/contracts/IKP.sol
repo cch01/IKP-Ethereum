@@ -40,7 +40,7 @@ contract IKP {
       uint reportedAt;
     }
 
-    uint public domainRegisterFee = 1 ether;
+    uint public registerDomainFee = 1 ether;
     uint public registerCaFee = 1 ether;
     uint public reportFee = 3 ether; 
 
@@ -54,14 +54,14 @@ contract IKP {
     mapping(string => string[]) public dcpPubKeys;
 
     mapping(bytes32 => RP) public rpList;
-    mapping(bytes32 => PendingRpPurchase) public pendingRpPurchaseMapping;
-    mapping(bytes32 => ReportRecord) private reportRecords;
+    mapping(bytes32 => PendingRpPurchase) private pendingRpPurchases;
+    mapping(bytes32 => ReportRecord) public reportRecords;
     
     event NewTransaction(string message);
     event RpPurchased(bytes32 rpHash);
 
     function registerCa (string memory _name, string[] memory _pks) public payable {
-        require(msg.value >= registerCaFee, "Not enough registration fee.");
+        require(msg.value == registerCaFee, "Not enough registration fee.");
         require(!caList[_name].inUse, "This account already in use.");
         CA memory newCa = CA({
             name: _name,
@@ -70,7 +70,7 @@ contract IKP {
         });
         caList[_name] = newCa;
         caPubKeys[_name] = _pks;
-        emit NewTransaction('Domain registered.');
+        emit NewTransaction('CA registered.');
     }
 
     //Use "getRpHash" to obtain rpHash to query desired RP status
@@ -89,7 +89,7 @@ contract IKP {
     }
 
     function registerDomain (string memory _name, address _checkerFunctionAddress, string[] memory _ligitimateKeys) public payable {
-        require(!dcpList[_name].inUse && msg.value >= domainRegisterFee, "Not enough registration fee. / This DCP already registered");
+        require(!dcpList[_name].inUse && msg.value == registerDomainFee, "Not enough registration fee. / This DCP already registered");
         DCP memory newDcp = DCP({
             inUse: true,
             domainName: _name,
@@ -98,7 +98,7 @@ contract IKP {
         });
         dcpList[_name] = newDcp;
         dcpPubKeys[_name] = _ligitimateKeys;
-        emit NewTransaction('CA registered.');
+        emit NewTransaction('Domain registered.');
     }
 
     function issueRp (string memory _dname, string memory _cname, address _reactionContractAddress) public payable {
@@ -106,8 +106,8 @@ contract IKP {
         
         bytes32 _rpHash = keccak256(abi.encodePacked(_dname, _cname));
         
-        require(keccak256(abi.encodePacked(_cname)) == keccak256(abi.encodePacked(pendingRpPurchaseMapping[_rpHash].cname)), "No RP purchase record found for this CA");
-        require(_reactionContractAddress == pendingRpPurchaseMapping[_rpHash].rpReactionAddr, "RP Reaction address not match.");
+        require(keccak256(abi.encodePacked(_cname)) == keccak256(abi.encodePacked(pendingRpPurchases[_rpHash].cname)), "No RP purchase record found for this CA");
+        require(_reactionContractAddress == pendingRpPurchases[_rpHash].rpReactionAddr, "RP Reaction address not match.");
         require(msg.sender == caList[_cname].paymentAccount, "CA not registered / You are not the target CA.");
 
         RP memory rp = RP({
@@ -120,8 +120,8 @@ contract IKP {
         caBalances[_cname] += msg.value;
 
         // Execute pending transaction from domain to CA
-        msg.sender.transfer(pendingRpPurchaseMapping[_rpHash].amount);
-        delete pendingRpPurchaseMapping[_rpHash];
+        msg.sender.transfer(pendingRpPurchases[_rpHash].amount);
+        delete pendingRpPurchases[_rpHash];
 
         emit NewTransaction('RP issued.');
     }
@@ -130,18 +130,18 @@ contract IKP {
       require(keccak256((abi.encodePacked(_dname))) == keccak256(abi.encodePacked(dcpList[_dname].domainName)), "This domain DCP not registered.");
       require(keccak256((abi.encodePacked(_cname))) == keccak256(abi.encodePacked(caList[_cname].name)), "CA invalid / not registered.");
       bytes32 _rpHash = keccak256(abi.encodePacked(_dname, _cname));
-      require(pendingRpPurchaseMapping[_rpHash].purchasedAt == 0, "Unconfirmed purchase record exist. Revoke purchase record before buying again if needed.");
+      require(pendingRpPurchases[_rpHash].purchasedAt == 0, "Unconfirmed purchase record exist. Revoke purchase record before buying again if needed.");
       PendingRpPurchase memory newPendingRpPurchase = PendingRpPurchase({ cname:_cname, amount:msg.value, domainAddr: msg.sender, purchasedAt: block.timestamp, rpReactionAddr:_reactionContractAddress });
-      pendingRpPurchaseMapping[_rpHash] = newPendingRpPurchase;
+      pendingRpPurchases[_rpHash] = newPendingRpPurchase;
 
       emit RpPurchased(_rpHash);
       return _rpHash;
     }
 
     function revokeUnconfirmedRpPurchase(bytes32 _rpHash) public {
-      require(msg.sender == pendingRpPurchaseMapping[_rpHash].domainAddr, "No purchase record found.");
-      msg.sender.transfer(pendingRpPurchaseMapping[_rpHash].amount);
-      delete pendingRpPurchaseMapping[_rpHash];
+      require(msg.sender == pendingRpPurchases[_rpHash].domainAddr, "No purchase record found.");
+      msg.sender.transfer(pendingRpPurchases[_rpHash].amount);
+      delete pendingRpPurchases[_rpHash];
       emit NewTransaction('RP purchase revoked.');
     }
 
