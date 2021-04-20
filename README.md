@@ -1,5 +1,5 @@
-# Ethereum-IKP
-realized IKP on Ethereum blockchain
+# Simplified IKP platform on Ethereum
+A demo for IKP system concept proofing, inspired by Matsumoto & Raphael: [IKP: Turning a PKI Around with Decentralized Automated Incentives](https://ieeexplore.ieee.org/document/7958590)
 
 
 ## 1. install dependency pkgs and truffle globally
@@ -15,7 +15,7 @@ Only needed to change if you are going to deploy the contract to testnet
 
 ## 3. Kick start any local blockchain services
 
-[Ganache](https://www.trufflesuite.com/ganache) will be a useful local development env tool.
+[Ganache](https://www.trufflesuite.com/ganache) will be a useful local blockchain development tool.
 
 ## 4. Deploy smart contracts on your local/testnet blockchain
 ```
@@ -29,6 +29,3 @@ yarn deploy-contracts
 ```
 yarn start
 ```
-
-## Notes
-Due to some reasons, the webapp will fail to launch if you use eslint to lint the scripts.
