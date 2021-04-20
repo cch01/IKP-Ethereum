@@ -365,6 +365,7 @@ window.App = {
 
 };
 
+// startup point of the app
 window.addEventListener('load', () => {
   App.start();
 });
