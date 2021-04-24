@@ -4,7 +4,7 @@ pragma solidity ^0.7;
 
 contract RPReaction {
 
-  address payable private ikp;
+  address payable public ikp;
 
   uint256 affectedDomainPayout = 5 ether; 
   uint256 detectionFee = 5 ether;
